@@ -32,14 +32,26 @@ class Catalog extends Config {
 
   foodPosition = 0;
 
-  createFood() {
+  // createFood() {
+  //   // Remove previous food;
+  //   gameBoard[this.foodPosition].classList.remove("food");
+  //   // Create new food
+  //   this.foodPosition = Math.random();
+  //   this.foodPosition = Math.floor(this.foodPosition * this.containerRow);
+  //   gameBoard[this.foodPosition].classList.add("food");
+  // };
+createFood() {
     // Remove previous food;
     gameBoard[this.foodPosition].classList.remove("food");
+
+    // Generate a new food position that is not part of the snake
+    do {
+        this.foodPosition = Math.floor(Math.random() * this.containerRow);
+    } while (gameBoard[this.foodPosition].classList.contains("snakeBodyPixel"));
+
     // Create new food
-    this.foodPosition = Math.random();
-    this.foodPosition = Math.floor(this.foodPosition * this.containerRow);
     gameBoard[this.foodPosition].classList.add("food");
-  };
+}
 
 
   // Snake
