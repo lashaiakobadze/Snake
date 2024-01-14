@@ -22,37 +22,26 @@ class Config {
 const gameBoard = document.getElementsByClassName("gameBoardPixel");
 /// Catalog
 class Catalog extends Config {
-
   createGameBoard() {
     for (let i = 1; i <= this.containerRow; i++) {
       container.innerHTML = `${container.innerHTML} <div class="gameBoardPixel" id="pixel${i}"></div>`;
     }
-  };
-
+  }
 
   foodPosition = 0;
 
-  // createFood() {
-  //   // Remove previous food;
-  //   gameBoard[this.foodPosition].classList.remove("food");
-  //   // Create new food
-  //   this.foodPosition = Math.random();
-  //   this.foodPosition = Math.floor(this.foodPosition * this.containerRow);
-  //   gameBoard[this.foodPosition].classList.add("food");
-  // };
-createFood() {
+  createFood() {
     // Remove previous food;
     gameBoard[this.foodPosition].classList.remove("food");
 
     // Generate a new food position that is not part of the snake
     do {
-        this.foodPosition = Math.floor(Math.random() * this.containerRow);
+      this.foodPosition = Math.floor(Math.random() * this.containerRow);
     } while (gameBoard[this.foodPosition].classList.contains("snakeBodyPixel"));
 
     // Create new food
     gameBoard[this.foodPosition].classList.add("food");
-}
-
+  }
 
   // Snake
   snakeDirection = this.right;
@@ -70,23 +59,47 @@ createFood() {
     } else if (newCode === this.down && this.snakeDirection != this.up) {
       this.snakeDirection = newCode;
     }
-  };
-
+  }
 
   // Let the starting position
-  snakeHeadPosition = this.containerRow*0.5;
-
+  snakeHeadPosition = this.containerRow * 0.5;
 
   // Initial snake length
   snakeLength = 200;
 
+  // Snake length counter
+  snakeLengthCounter = document.getElementById("snakeLengthCounter");
+
+  // Best score counter
+  bestScoreCounter = document.getElementById("bestScoreCounter");
+  bestScore = localStorage.getItem("bestScore") || 0;
+
+  constructor() {
+    super();
+    // Initialize best score counter text content
+    this.bestScoreCounter.textContent = `Top: ${this.bestScore / 100}`;
+  }
+
+  updateBestScore() {
+    if (this.snakeLength > this.bestScore) {
+      this.bestScore = this.snakeLength;
+      localStorage.setItem("bestScore", this.bestScore.toString());
+      this.bestScoreCounter.textContent = `Top: ${this.bestScore / 100}`;
+    }
+  }
+
+  updateSnakeLengthCounter() {
+    this.snakeLengthCounter.textContent = `Score: ${this.snakeLength / 100}`;
+  }
 
   // Move snake and repeat this function:
-  moveSnake(){
+  moveSnake() {
     switch (this.snakeDirection) {
       case this.left:
         --this.snakeHeadPosition;
-        const snakeOnLeft = this.snakeHeadPosition % this.row === this.row - 1 || this.snakeHeadPosition < 0;
+        const snakeOnLeft =
+          this.snakeHeadPosition % this.row === this.row - 1 ||
+          this.snakeHeadPosition < 0;
         if (snakeOnLeft) {
           this.snakeHeadPosition = this.snakeHeadPosition + this.row;
         }
@@ -111,8 +124,9 @@ createFood() {
         if (snakeOnDown) {
           this.snakeHeadPosition = this.snakeHeadPosition - this.containerRow;
         }
-      break;
-      default: break;
+        break;
+      default:
+        break;
     }
 
     let nextSnakeHeadPixel = gameBoard[this.snakeHeadPosition];
@@ -132,13 +146,15 @@ createFood() {
     // Eat food.
     if (this.snakeHeadPosition === this.foodPosition) {
       this.snakeLength = this.snakeLength + 100;
+      this.updateSnakeLengthCounter();
       this.createFood();
+      this.updateBestScore(); // Check if it's a new best score
     }
-  };
+  }
 
   // Move snake:
-  moveSnakeInterval = setInterval( () => {
-    this.moveSnake()
+  moveSnakeInterval = setInterval(() => {
+    this.moveSnake();
   }, 100);
   moveSnakeInterval;
 
@@ -152,5 +168,4 @@ createFood() {
 
 let snake = new Catalog();
 snake.game();
-
 
